@@ -18,9 +18,7 @@ model.add(Activation('softmax'))
 
 
 # Compile Model
-model.compile(optimizer='sgd',
-              loss='categorical_crossentropy', 
-              metrics=['accuracy'])
+model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Train Model
 history = model.fit(x_train, y_train, 
