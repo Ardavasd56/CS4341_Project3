@@ -4,8 +4,8 @@ import numpy as np
 
 # Model Template
 
-model = Sequential() # declare model
-model.add(Dense(10, input_shape=(28*28, ), kernel_initializer='he_normal')) # first layer
+model = Sequential()  # declare model
+model.add(Dense(10, input_shape=(28*28, ), kernel_initializer='he_normal'))  # first layer
 model.add(Activation('relu'))
 #
 #
@@ -13,7 +13,7 @@ model.add(Activation('relu'))
 # Fill in Model Here
 #
 #
-model.add(Dense(10, kernel_initializer='he_normal')) # last layer
+model.add(Dense(10, kernel_initializer='he_normal'))  # last layer
 model.add(Activation('softmax'))
 
 
@@ -31,3 +31,4 @@ history = model.fit(x_train, y_train,
 
 print(history.history)
 model.predict()
+
