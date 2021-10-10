@@ -10,10 +10,10 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
-images = np.load('./images.npy')
-images = np.reshape(images, (len(images), 28*28))
+images = np.load("./images.npy")
+images = np.reshape(images, (len(images), 28 * 28))
 
-labels = np.load('./labels.npy')
+labels = np.load("./labels.npy")
 
 seed = 42
 np.random.seed(seed)
@@ -23,49 +23,66 @@ print(labels.shape)
 
 labels = tf.keras.utils.to_categorical(labels)
 
-x_train, x_test, y_train, y_test = train_test_split(images, labels, test_size=0.40, random_state=42)
-x_test, x_validation, y_test, y_validation = train_test_split(x_test, y_test, test_size=0.375, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(
+    images, labels, test_size=0.40, random_state=seed, stratify=labels
+)
+x_test, x_validation, y_test, y_validation = train_test_split(
+    x_test, y_test, test_size=0.375, random_state=seed, stratify=y_test
+)
 print(x_train.shape)
 print(x_validation.shape)
 print(x_test.shape)
 
 # Model Template
 model = Sequential()  # declare model
-model.add(Dense(1024, input_shape=(28 * 28,), kernel_initializer='he_normal'))  # first layer
-model.add(Activation('relu'))
+model.add(
+    Dense(512, input_shape=(28 * 28,), kernel_initializer="he_normal")
+)  # first layer
+model.add(Activation("relu"))
 
-model.add(Dense(512, kernel_initializer='random_uniform'))
-model.add(Activation('relu'))
+model.add(Dense(256, kernel_initializer="random_uniform"))
+model.add(Activation("relu"))
 
-model.add(Dense(256, kernel_initializer='random_uniform'))
-model.add(Activation('relu'))
+model.add(Dense(256, kernel_initializer="random_uniform"))
+model.add(Activation("relu"))
 
-model.add(Dense(128, kernel_initializer='random_uniform'))
-model.add(Activation('relu'))
+model.add(Dense(256, kernel_initializer="random_uniform"))
+model.add(Activation("relu"))
 
-model.add(Dense(32, kernel_initializer='random_uniform'))
-model.add(Activation('relu'))
+model.add(Dense(32, kernel_initializer="random_uniform"))
+model.add(Activation("relu"))
 
 # Softmax is often used as the activation for the last layer of a classification network
 # because the result could be interpreted as a probability distribution.
-model.add(Dense(10, kernel_initializer='he_normal'))  # last layer
-model.add(Activation('softmax'))
+model.add(Dense(10, kernel_initializer="he_normal"))  # last layer
+model.add(Activation("softmax"))
 
 print(model.summary())
 # Compile Model
-model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
 
 # Train Model
-history = model.fit(x_train, y_train,
-                    validation_data=(x_validation, y_validation),
-                    epochs=90,
-                    batch_size=256)
+history = model.fit(
+    x_train,
+    y_train,
+    validation_data=(x_validation, y_validation),
+    epochs=90,
+    batch_size=256,
+)
 
 # Report Results
 
 print(history.history)
-plt.plot(range(len(history.history.get("accuracy"))), history.history.get("accuracy"), label="accuracy")
-plt.plot(range(len(history.history.get("val_accuracy"))), history.history.get("val_accuracy"), label="val_accuracy")
+plt.plot(
+    range(len(history.history.get("accuracy"))),
+    history.history.get("accuracy"),
+    label="accuracy",
+)
+plt.plot(
+    range(len(history.history.get("val_accuracy"))),
+    history.history.get("val_accuracy"),
+    label="val_accuracy",
+)
 plt.legend(loc="lower right")
 plt.xlabel("epoch")
 plt.ylabel("accuracy")
@@ -73,8 +90,14 @@ plt.savefig("accuracy.png")
 
 plt.clf()
 
-plt.plot(range(len(history.history.get("loss"))), history.history.get("loss"), label="loss")
-plt.plot(range(len(history.history.get("val_loss"))), history.history.get("val_loss"), label="val_loss")
+plt.plot(
+    range(len(history.history.get("loss"))), history.history.get("loss"), label="loss"
+)
+plt.plot(
+    range(len(history.history.get("val_loss"))),
+    history.history.get("val_loss"),
+    label="val_loss",
+)
 plt.legend(loc="upper right")
 plt.xlabel("epoch")
 plt.ylabel("loss")
@@ -118,20 +141,26 @@ for t in y_test:
 
 
 # Generate Confusion Matrix
-y_actual = pd.Series(actual, name='Actual')
-y_predict = pd.Series(projection, name='Predicted')
+y_actual = pd.Series(actual, name="Actual")
+y_predict = pd.Series(projection, name="Predicted")
 confusion_matrix = pd.crosstab(y_actual, y_predict)
 
 # Generate normalized confusion matrix
 norm_confusion_matrix = confusion_matrix / confusion_matrix.sum(axis=1)
 
 # Generate full confusion matrix with totals
-full_confusion_matrix = pd.crosstab(y_actual, y_predict, rownames=['True Label'], colnames=['Predicted Label'], margins=True)
+full_confusion_matrix = pd.crosstab(
+    y_actual,
+    y_predict,
+    rownames=["True Label"],
+    colnames=["Predicted Label"],
+    margins=True,
+)
 
 # print(norm_confusion_matrix)
 print(full_confusion_matrix)
 
-cmap = mpl.cm.get_cmap('Oranges')
+cmap = mpl.cm.get_cmap("Oranges")
 plt.matshow(confusion_matrix, cmap=cmap)
 plt.colorbar()
 tick_marks = np.arange(len(confusion_matrix.columns))
