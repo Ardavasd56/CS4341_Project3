@@ -1,14 +1,12 @@
-import math
-
 import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 import numpy as np
-import keras
 from sklearn.model_selection import train_test_split
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
+from tensorflow.keras.models import load_model
 
 images = np.load("./images.npy")
 images = np.reshape(images, (len(images), 28 * 28))
@@ -34,44 +32,45 @@ print(x_validation.shape)
 print(x_test.shape)
 
 # Model Template
-model = Sequential()  # declare model
-model.add(
-    Dense(512, input_shape=(28 * 28,), kernel_initializer="he_normal")
-)  # first layer
-model.add(Activation("relu"))
+# model = Sequential()  # declare model
+# model.add(
+#     Dense(
+#         784,
+#         input_shape=(28 * 28,),
+#         kernel_initializer="random_uniform",
+#         activation="relu",
+#     )
+# )  # first layer
 
-model.add(Dense(256, kernel_initializer="random_uniform"))
-model.add(Activation("relu"))
+# model.add(Dense(392, kernel_initializer="random_uniform", activation="relu"))
 
-model.add(Dense(256, kernel_initializer="random_uniform"))
-model.add(Activation("relu"))
+# model.add(Dense(196, kernel_initializer="random_uniform", activation="relu"))
 
-model.add(Dense(256, kernel_initializer="random_uniform"))
-model.add(Activation("relu"))
+# # model.add(Dense(98, kernel_initializer="random_uniform", activation="relu"))
 
-model.add(Dense(32, kernel_initializer="random_uniform"))
-model.add(Activation("relu"))
+# model.add(Dense(98, kernel_initializer="glorot_uniform", activation="tanh"))
 
-# Softmax is often used as the activation for the last layer of a classification network
-# because the result could be interpreted as a probability distribution.
-model.add(Dense(10, kernel_initializer="he_normal"))  # last layer
-model.add(Activation("softmax"))
+# # Softmax is often used as the activation for the last layer of a classification network
+# # because the result could be interpreted as a probability distribution.
+# model.add(Dense(10, kernel_initializer="he_normal", activation="softmax"))  # last layer
 
-print(model.summary())
-# Compile Model
-model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
+# print(model.summary())
+# # Compile Model
+# model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
+model = load_model("best_trained_model.h5")
 
 # Train Model
 history = model.fit(
     x_train,
     y_train,
     validation_data=(x_validation, y_validation),
-    epochs=90,
-    batch_size=256,
+    epochs=100,
+    batch_size=128,
 )
 
-# Report Results
+# model.save("best_trained_model.h5")
 
+# Training Performance Plot
 print(history.history)
 plt.plot(
     range(len(history.history.get("accuracy"))),
@@ -105,50 +104,41 @@ plt.savefig("loss.png")
 
 plt.clf()
 
+# Model Prediction
 prediction = model.predict(x_test)
 
+# Model Evaluation
 scores = model.evaluate(x_test, y_test, verbose=0)
 print("\n")
 print(scores)
 accuracy = scores[1] * 100
 error = 100 - scores[1] * 100
-print("Error: %.2f%%" % error)
 print("Accuracy: %.2f%%" % accuracy)
+print("Error: %.2f%%" % error)
 
+# Confustion Matrix
 projection, actual = [], []
 
-# Iterate through predictions, determining which value recieved the highest prediction and
-#   marking that value in a list (denoting our prediction)
 for p in prediction:
 
-    # Reset max value, index, and max index each iteration
     maximum = float(0)
     index, max_index = 0, -1
 
-    # Iterate through each set of preductions determining the highest predicted value
     for n in p:
         if float(n) > maximum:
             maximum = float(n)
             max_index = index
         index += 1
 
-    # Mark our projection for this set in our list
     projection.append(max_index)
 
-# Convert test set (actuals) back to standard numerical format
 for t in y_test:
     actual.append(np.argmax(t))
 
-
-# Generate Confusion Matrix
 y_actual = pd.Series(actual, name="Actual")
 y_predict = pd.Series(projection, name="Predicted")
 confusion_matrix = pd.crosstab(y_actual, y_predict)
 
-# Generate normalized confusion matrix
-norm_confusion_matrix = confusion_matrix / confusion_matrix.sum(axis=1)
-
-# Generate full confusion matrix with totals
 full_confusion_matrix = pd.crosstab(
     y_actual,
     y_predict,
@@ -157,10 +147,9 @@ full_confusion_matrix = pd.crosstab(
     margins=True,
 )
 
-# print(norm_confusion_matrix)
 print(full_confusion_matrix)
 
-cmap = mpl.cm.get_cmap("Oranges")
+cmap = mpl.cm.get_cmap("GnBu")
 plt.matshow(confusion_matrix, cmap=cmap)
 plt.colorbar()
 tick_marks = np.arange(len(confusion_matrix.columns))
