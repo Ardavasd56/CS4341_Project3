@@ -3,10 +3,12 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 from tensorflow.keras.models import load_model
+import seaborn as sns
 
 images = np.load("./images.npy")
 images = np.reshape(images, (len(images), 28 * 28))
