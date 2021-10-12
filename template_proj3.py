@@ -1,6 +1,7 @@
 import math
 
 import tensorflow as tf
+from keras import regularizers
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 import numpy as np
@@ -36,11 +37,11 @@ print(x_test.shape)
 # Model Template
 model = Sequential()  # declare model
 model.add(
-    Dense(512, input_shape=(28 * 28,), kernel_initializer="he_normal")
+    Dense(1024, input_shape=(28 * 28,), kernel_initializer="he_normal")
 )  # first layer
 model.add(Activation("relu"))
 
-model.add(Dense(256, kernel_initializer="random_uniform"))
+model.add(Dense(512, kernel_initializer="random_uniform"))
 model.add(Activation("relu"))
 
 model.add(Dense(256, kernel_initializer="random_uniform"))
@@ -49,8 +50,14 @@ model.add(Activation("relu"))
 model.add(Dense(256, kernel_initializer="random_uniform"))
 model.add(Activation("relu"))
 
-model.add(Dense(32, kernel_initializer="random_uniform"))
+model.add(Dense(256, kernel_initializer="random_uniform"))
 model.add(Activation("relu"))
+
+model.add(Dense(128, kernel_initializer="random_uniform"))
+model.add(Activation("relu"))
+
+model.add(Dense(32, kernel_initializer="glorot_uniform"))
+model.add(Activation("tanh"))
 
 # Softmax is often used as the activation for the last layer of a classification network
 # because the result could be interpreted as a probability distribution.
@@ -66,9 +73,8 @@ history = model.fit(
     x_train,
     y_train,
     validation_data=(x_validation, y_validation),
-    epochs=90,
-    batch_size=256,
-)
+    epochs=100,
+    batch_size=256)
 
 # Report Results
 
