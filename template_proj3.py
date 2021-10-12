@@ -43,19 +43,19 @@ print(x_test.shape)
 #         activation="relu",
 #     )
 # )  # first layer
-
+#
 # model.add(Dense(392, kernel_initializer="random_uniform", activation="relu"))
-
+#
 # model.add(Dense(196, kernel_initializer="random_uniform", activation="relu"))
-
+#
 # # model.add(Dense(98, kernel_initializer="random_uniform", activation="relu"))
-
+#
 # model.add(Dense(98, kernel_initializer="glorot_uniform", activation="tanh"))
-
+#
 # # Softmax is often used as the activation for the last layer of a classification network
 # # because the result could be interpreted as a probability distribution.
 # model.add(Dense(10, kernel_initializer="he_normal", activation="softmax"))  # last layer
-
+#
 # print(model.summary())
 # # Compile Model
 # model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
@@ -77,12 +77,12 @@ print(history.history)
 plt.plot(
     range(len(history.history.get("accuracy"))),
     history.history.get("accuracy"),
-    label="accuracy",
+    label="train_accuracy",
 )
 plt.plot(
     range(len(history.history.get("val_accuracy"))),
     history.history.get("val_accuracy"),
-    label="val_accuracy",
+    label="validation_accuracy",
 )
 plt.legend(loc="lower right")
 plt.xlabel("epoch")
@@ -92,12 +92,12 @@ plt.savefig("accuracy.png")
 plt.clf()
 
 plt.plot(
-    range(len(history.history.get("loss"))), history.history.get("loss"), label="loss"
+    range(len(history.history.get("loss"))), history.history.get("loss"), label="train_loss"
 )
 plt.plot(
     range(len(history.history.get("val_loss"))),
     history.history.get("val_loss"),
-    label="val_loss",
+    label="validation_loss",
 )
 plt.legend(loc="upper right")
 plt.xlabel("epoch")
